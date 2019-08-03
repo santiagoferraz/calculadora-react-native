@@ -8,21 +8,43 @@ import {
 import Button from './src/components/Button';
 import Display from './src/components/Display';
 
+
 class App extends React.Component {
+  inicialState = {
+    displayValue: "0",
+    clearDisplay: false,
+    operation: null,
+    values: [0, 0],
+    current: 0
+  }
+  
   state = {
-    displayValue: '0'
+    displayValue: { ...inicialState }
   }
 
   addDigit = n => {
-    this.setState({ displayValue: n })
+    if(n === "." && this.state.displayValue.includes(".")) { return; }
+
+    const clearDisplay = this.state.displayValue === "0" || this.state.clearDisplay;
+    const currentValue = clearDisplay ? "" : this.state.displayValue;
+    const displayValue = currentValue + n;
+    this.setState({ displayValue, clearDisplay: false });
+
+    if(n !== ".") {
+      const newValue = parseFloat(displayValue);
+      const values = { ...this.state.value };
+      values[this.state.current] = newValue;
+      this.setState({ values });
+    }
   }
 
   clearMemory = () => {
-    this.setState({ displayValue: '0' })
+    this.setState({ ...this.inicialState })
   }
 
   setOperation = o => {
-    console.log(o);
+    let result = eval(this.state.displayValue);
+    this.setState({ displayValue: result });
   }
   render() {
     return (
@@ -42,7 +64,7 @@ class App extends React.Component {
           <Button label="1" onClick={this.addDigit} />
           <Button label="2" onClick={this.addDigit} />
           <Button label="3" onClick={this.addDigit} />
-          <Button label="+" operation onClick={this.setOperation} />
+          <Button label="+" operation onClick={this.addDigit} />
           <Button label="0" double onClick={this.addDigit} />
           <Button label="." onClick={this.addDigit} />
           <Button label="=" operation onClick={this.setOperation} />
